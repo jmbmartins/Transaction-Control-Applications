@@ -42,7 +42,7 @@ namespace LoginApp
         {
             IdEnc = txtBox.Text;
 
-            //grava o registo de acesso á base de dados
+            // Registo do Acesso à Encomenda Pretendida
             using (SqlConnection connection = new SqlConnection(FormLogin.connectionString))
             {
                 connection.Open();
@@ -53,7 +53,7 @@ namespace LoginApp
                 string user = FormLogin.user;
 
                 DateTime date_now = DateTime.UtcNow;
-                string User_Reference = "G3-" + date_now.ToString("yyMMddHmmss");
+                string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
 
                 string logReguisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
                 command.CommandText = logReguisterQuery;

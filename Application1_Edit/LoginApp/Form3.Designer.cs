@@ -33,15 +33,16 @@
             txtBoxMorada = new TextBox();
             txtBoxQtd = new TextBox();
             dataGridView1 = new DataGridView();
-            btnAlterMorada = new Button();
-            btnAlterQtd = new Button();
+            btnSubmit = new Button();
+            labelProduto = new Label();
+            txtBoxProdutoId = new TextBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
             // labelMorada
             // 
             labelMorada.AutoSize = true;
-            labelMorada.Location = new Point(66, 33);
+            labelMorada.Location = new Point(12, 33);
             labelMorada.Name = "labelMorada";
             labelMorada.Size = new Size(64, 20);
             labelMorada.TabIndex = 0;
@@ -50,7 +51,7 @@
             // labelQuantidade
             // 
             labelQuantidade.AutoSize = true;
-            labelQuantidade.Location = new Point(66, 87);
+            labelQuantidade.Location = new Point(674, 79);
             labelQuantidade.Name = "labelQuantidade";
             labelQuantidade.Size = new Size(90, 20);
             labelQuantidade.TabIndex = 1;
@@ -58,54 +59,62 @@
             // 
             // txtBoxMorada
             // 
-            txtBoxMorada.Location = new Point(185, 30);
+            txtBoxMorada.Location = new Point(82, 30);
             txtBoxMorada.Name = "txtBoxMorada";
-            txtBoxMorada.Size = new Size(100, 27);
+            txtBoxMorada.Size = new Size(434, 27);
             txtBoxMorada.TabIndex = 7;
             // 
             // txtBoxQtd
             // 
-            txtBoxQtd.Location = new Point(185, 80);
+            txtBoxQtd.Location = new Point(782, 72);
             txtBoxQtd.Name = "txtBoxQtd";
-            txtBoxQtd.Size = new Size(213, 27);
+            txtBoxQtd.Size = new Size(88, 27);
             txtBoxQtd.TabIndex = 3;
             // 
             // dataGridView1
             // 
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(1, 135);
+            dataGridView1.Location = new Point(2, 125);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.RowHeadersWidth = 51;
             dataGridView1.RowTemplate.Height = 29;
             dataGridView1.Size = new Size(1253, 380);
             dataGridView1.TabIndex = 4;
             // 
-            // btnAlterMorada
+            // btnSubmit
             // 
-            btnAlterMorada.Location = new Point(626, 30);
-            btnAlterMorada.Name = "btnAlterMorada";
-            btnAlterMorada.Size = new Size(94, 29);
-            btnAlterMorada.TabIndex = 5;
-            btnAlterMorada.Text = "Submeter";
-            btnAlterMorada.UseVisualStyleBackColor = true;
-            btnAlterMorada.Click += btnAlterMorada_Click_1;
+            btnSubmit.Location = new Point(1075, 46);
+            btnSubmit.Name = "btnSubmit";
+            btnSubmit.Size = new Size(94, 29);
+            btnSubmit.TabIndex = 5;
+            btnSubmit.Text = "Submeter";
+            btnSubmit.UseVisualStyleBackColor = true;
+            btnSubmit.Click += btnSubmit_Click;
             // 
-            // btnAlterQtd
+            // labelProduto
             // 
-            btnAlterQtd.Location = new Point(626, 78);
-            btnAlterQtd.Name = "btnAlterQtd";
-            btnAlterQtd.Size = new Size(94, 29);
-            btnAlterQtd.TabIndex = 6;
-            btnAlterQtd.Text = "Submeter";
-            btnAlterQtd.UseVisualStyleBackColor = true;
+            labelProduto.AutoSize = true;
+            labelProduto.Location = new Point(674, 29);
+            labelProduto.Name = "labelProduto";
+            labelProduto.Size = new Size(75, 20);
+            labelProduto.TabIndex = 8;
+            labelProduto.Text = "ProdutoId";
+            // 
+            // txtBoxProdutoId
+            // 
+            txtBoxProdutoId.Location = new Point(782, 26);
+            txtBoxProdutoId.Name = "txtBoxProdutoId";
+            txtBoxProdutoId.Size = new Size(88, 27);
+            txtBoxProdutoId.TabIndex = 9;
             // 
             // Form3
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1257, 517);
-            Controls.Add(btnAlterQtd);
-            Controls.Add(btnAlterMorada);
+            Controls.Add(txtBoxProdutoId);
+            Controls.Add(labelProduto);
+            Controls.Add(btnSubmit);
             Controls.Add(dataGridView1);
             Controls.Add(txtBoxQtd);
             Controls.Add(txtBoxMorada);
@@ -126,7 +135,8 @@
         private TextBox txtBoxMorada;
         private TextBox txtBoxQtd;
         private DataGridView dataGridView1;
-        private Button btnAlterMorada;
-        private Button btnAlterQtd;
+        private Button btnSubmit;
+        private Label labelProduto;
+        private TextBox txtBoxProdutoId;
     }
 }
