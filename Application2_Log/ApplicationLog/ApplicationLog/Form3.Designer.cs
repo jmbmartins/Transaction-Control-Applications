@@ -28,24 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
+            components = new System.ComponentModel.Container();
             dataGridView1 = new DataGridView();
             button2 = new Button();
             label1 = new Label();
             nLinhas = new TextBox();
+            timer1 = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
-            // 
-            // button1
-            // 
-            button1.Location = new Point(832, 14);
-            button1.Margin = new Padding(4, 3, 4, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(88, 27);
-            button1.TabIndex = 0;
-            button1.Text = "Atualizar";
-            button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // dataGridView1
             // 
@@ -65,7 +55,7 @@
             button2.TabIndex = 2;
             button2.Text = "Procurar";
             button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            button2.Click += button2_Click;
             // 
             // label1
             // 
@@ -85,6 +75,12 @@
             nLinhas.Size = new Size(207, 23);
             nLinhas.TabIndex = 4;
             // 
+            // timer1
+            // 
+            timer1.Enabled = true;
+            timer1.Interval = 5000;
+            timer1.Tick += timer1_Tick;
+            // 
             // Form3
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -94,7 +90,6 @@
             Controls.Add(label1);
             Controls.Add(button2);
             Controls.Add(dataGridView1);
-            Controls.Add(button1);
             Margin = new Padding(4, 3, 4, 3);
             Name = "Form3";
             Text = "Form2";
@@ -105,11 +100,10 @@
         }
 
         #endregion
-
-        private Button button1;
         private DataGridView dataGridView1;
         private Button button2;
         private Label label1;
         private TextBox nLinhas;
+        private System.Windows.Forms.Timer timer1;
     }
 }
