@@ -62,8 +62,8 @@ namespace LoginApp
                 connection.Close();
             }
 
-            
 
+            nivel_isolamento = domainIsolLevl.Text;
             Form3 form3 = new Form3();
             form3.Show();
         }
