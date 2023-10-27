@@ -31,9 +31,9 @@ namespace LoginApp
                 SqlHelper helper = new SqlHelper(connectionString);
                 if (helper.IsConnection)
                     MessageBox.Show("Test connection succeded.", "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Form2 form2 = new Form2();
-                    form2.Show();
-                    
+                Form2 form2 = new Form2();
+                form2.Show();
+
             }
             catch (Exception ex)
             {

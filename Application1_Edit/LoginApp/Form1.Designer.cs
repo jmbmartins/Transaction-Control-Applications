@@ -42,9 +42,10 @@
             // 
             // btnOk
             // 
-            btnOk.Location = new Point(171, 245);
+            btnOk.Location = new Point(195, 327);
+            btnOk.Margin = new Padding(3, 4, 3, 4);
             btnOk.Name = "btnOk";
-            btnOk.Size = new Size(100, 23);
+            btnOk.Size = new Size(114, 31);
             btnOk.TabIndex = 0;
             btnOk.Tag = "";
             btnOk.Text = "Ok";
@@ -53,9 +54,10 @@
             // 
             // btnCancel
             // 
-            btnCancel.Location = new Point(313, 245);
+            btnCancel.Location = new Point(358, 327);
+            btnCancel.Margin = new Padding(3, 4, 3, 4);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(100, 23);
+            btnCancel.Size = new Size(114, 31);
             btnCancel.TabIndex = 1;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
@@ -64,73 +66,78 @@
             // labelHostName
             // 
             labelHostName.AutoSize = true;
-            labelHostName.Location = new Point(178, 52);
+            labelHostName.Location = new Point(203, 69);
             labelHostName.Name = "labelHostName";
-            labelHostName.Size = new Size(70, 15);
+            labelHostName.Size = new Size(87, 20);
             labelHostName.TabIndex = 2;
             labelHostName.Text = "Host Name:";
             // 
             // labelDB
             // 
             labelDB.AutoSize = true;
-            labelDB.Location = new Point(178, 89);
+            labelDB.Location = new Point(203, 119);
             labelDB.Name = "labelDB";
-            labelDB.Size = new Size(93, 15);
+            labelDB.Size = new Size(119, 20);
             labelDB.TabIndex = 3;
             labelDB.Text = "Database Name:";
             // 
             // labelUser
             // 
             labelUser.AutoSize = true;
-            labelUser.Location = new Point(178, 126);
+            labelUser.Location = new Point(203, 168);
             labelUser.Name = "labelUser";
-            labelUser.Size = new Size(65, 15);
+            labelUser.Size = new Size(82, 20);
             labelUser.TabIndex = 4;
             labelUser.Text = "User Name";
             // 
             // labelPW
             // 
             labelPW.AutoSize = true;
-            labelPW.Location = new Point(178, 164);
+            labelPW.Location = new Point(203, 219);
             labelPW.Name = "labelPW";
-            labelPW.Size = new Size(57, 15);
+            labelPW.Size = new Size(70, 20);
             labelPW.TabIndex = 5;
             labelPW.Text = "Password";
             // 
             // txtDB
             // 
-            txtDB.Location = new Point(277, 86);
+            txtDB.Location = new Point(317, 115);
+            txtDB.Margin = new Padding(3, 4, 3, 4);
             txtDB.Name = "txtDB";
-            txtDB.Size = new Size(152, 23);
+            txtDB.Size = new Size(173, 27);
             txtDB.TabIndex = 7;
             // 
             // txtUsername
             // 
-            txtUsername.Location = new Point(277, 126);
+            txtUsername.Location = new Point(317, 168);
+            txtUsername.Margin = new Padding(3, 4, 3, 4);
             txtUsername.Name = "txtUsername";
-            txtUsername.Size = new Size(78, 23);
+            txtUsername.Size = new Size(89, 27);
             txtUsername.TabIndex = 8;
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(277, 164);
+            txtPassword.Location = new Point(317, 219);
+            txtPassword.Margin = new Padding(3, 4, 3, 4);
             txtPassword.Name = "txtPassword";
-            txtPassword.Size = new Size(152, 23);
+            txtPassword.Size = new Size(173, 27);
             txtPassword.TabIndex = 9;
+            txtPassword.UseSystemPasswordChar = true;
             // 
             // cboServer
             // 
             cboServer.FormattingEnabled = true;
-            cboServer.Location = new Point(277, 49);
+            cboServer.Location = new Point(317, 65);
+            cboServer.Margin = new Padding(3, 4, 3, 4);
             cboServer.Name = "cboServer";
-            cboServer.Size = new Size(152, 23);
+            cboServer.Size = new Size(173, 28);
             cboServer.TabIndex = 10;
             // 
             // FormLogin
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(576, 309);
+            ClientSize = new Size(658, 412);
             Controls.Add(cboServer);
             Controls.Add(txtPassword);
             Controls.Add(txtUsername);
@@ -141,6 +148,7 @@
             Controls.Add(labelHostName);
             Controls.Add(btnCancel);
             Controls.Add(btnOk);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "FormLogin";
             Text = "Login...";
             Load += FormLogin_Load;
