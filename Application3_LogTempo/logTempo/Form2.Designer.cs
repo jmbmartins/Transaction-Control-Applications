@@ -31,52 +31,56 @@ namespace logTempo
         /// </summary>
         private void InitializeComponent()
         {
-            labelIsolation = new Label();
-            domainIsolLevl = new DomainUpDown();
-            btnAcessEnc = new Button();
-            SuspendLayout();
+            this.labelIsolation = new System.Windows.Forms.Label();
+            this.domainIsolLevl = new System.Windows.Forms.DomainUpDown();
+            this.btnAcessEnc = new System.Windows.Forms.Button();
+            this.SuspendLayout();
             // 
             // labelIsolation
             // 
-            labelIsolation.AutoSize = true;
-            labelIsolation.Location = new Point(133, 79);
-            labelIsolation.Name = "labelIsolation";
-            labelIsolation.Size = new Size(99, 15);
-            labelIsolation.TabIndex = 1;
-            labelIsolation.Text = "Nivel de Isolação:";
+            this.labelIsolation.AutoSize = true;
+            this.labelIsolation.Location = new System.Drawing.Point(152, 84);
+            this.labelIsolation.Name = "labelIsolation";
+            this.labelIsolation.Size = new System.Drawing.Size(115, 16);
+            this.labelIsolation.TabIndex = 1;
+            this.labelIsolation.Text = "Nivel de Isolação:";
             // 
             // domainIsolLevl
             // 
-            domainIsolLevl.Location = new Point(253, 79);
-            domainIsolLevl.Margin = new Padding(3, 2, 3, 2);
-            domainIsolLevl.Name = "domainIsolLevl";
-            domainIsolLevl.Size = new Size(148, 23);
-            domainIsolLevl.TabIndex = 2;
-            domainIsolLevl.Text = "Select Isolation Level";
+            this.domainIsolLevl.Location = new System.Drawing.Point(289, 84);
+            this.domainIsolLevl.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.domainIsolLevl.Name = "domainIsolLevl";
+            this.domainIsolLevl.Size = new System.Drawing.Size(169, 22);
+            this.domainIsolLevl.TabIndex = 2;
+            this.domainIsolLevl.Text = "Select Isolation Level";
+            this.domainIsolLevl.SelectedItemChanged += new System.EventHandler(this.domainIsolLevl_SelectedItemChanged);
             // 
             // btnAcessEnc
             // 
-            btnAcessEnc.Location = new Point(192, 164);
-            btnAcessEnc.Margin = new Padding(3, 2, 3, 2);
-            btnAcessEnc.Name = "btnAcessEnc";
-            btnAcessEnc.Size = new Size(82, 22);
-            btnAcessEnc.TabIndex = 4;
-            btnAcessEnc.Text = "Aceder";
-            btnAcessEnc.UseVisualStyleBackColor = true;
+            this.btnAcessEnc.Location = new System.Drawing.Point(219, 175);
+            this.btnAcessEnc.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.btnAcessEnc.Name = "btnAcessEnc";
+            this.btnAcessEnc.Size = new System.Drawing.Size(94, 23);
+            this.btnAcessEnc.TabIndex = 4;
+            this.btnAcessEnc.Text = "Aceder";
+            this.btnAcessEnc.UseVisualStyleBackColor = true;
+            this.btnAcessEnc.Click += new System.EventHandler(this.btnAcessEnc_Click_1);
             // 
             // Form2
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(514, 291);
-            Controls.Add(btnAcessEnc);
-            Controls.Add(domainIsolLevl);
-            Controls.Add(labelIsolation);
-            Margin = new Padding(3, 2, 3, 2);
-            Name = "Form2";
-            Text = "Form2";
-            ResumeLayout(false);
-            PerformLayout();
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(587, 310);
+            this.Controls.Add(this.btnAcessEnc);
+            this.Controls.Add(this.domainIsolLevl);
+            this.Controls.Add(this.labelIsolation);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.Name = "Form2";
+            this.Text = "Form2";
+            this.Load += new System.EventHandler(this.Form2_Load_1);
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion

@@ -22,12 +22,23 @@ namespace logTempo
         private void Form3_Load(object sender, EventArgs e)
         {
             SqlConnection sqlConnection = new SqlConnection(Form1.Connection);
-            string query = "SELECT LO1.UserId, LO1.Objecto as EncId, DATEDIFF(SS,LO1.Valor, LO2.Valor) as Tempo FROM LogOperations LO1, LogOperations LO2 WHERE LO1.Referencia = LO2.Referencia and LO1.DCriacao < LO2.DCRiacao and LO1.Referencia = 'G1-20231001101356321' ";
+
+
+            string query = @"
+                            SELECT LO1.UserId, LO1.Objecto as EncId, DATEDIFF(SS, LO1.Valor, LO2.Valor) as Tempo
+                            FROM LogOperations LO1
+                            JOIN LogOperations LO2 ON LO1.Referencia = LO2.Referencia
+                            WHERE LO1.DCriacao < LO2.DCriacao
+                            AND LO1.EventType = 'O'
+                            AND LO2.EventType = 'O'
+                            ";
 
             var sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
+
             var dataTable = new DataTable();
             sqlDataAdapter.Fill(dataTable);
             dataGridView1.DataSource = dataTable;
         }
+
     }
 }

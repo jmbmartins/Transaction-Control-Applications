@@ -18,7 +18,21 @@ namespace logTempo
             InitializeComponent();
         }
 
-        private void Form2_Load(object sender, EventArgs e)
+     
+        private void domainIsolLevl_SelectedItemChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAcessEnc_Click_1(object sender, EventArgs e)
+        {
+            nivel_isolamento = domainIsolLevl.Text;
+
+            Form3 form3 = new Form3();
+            form3.Show();
+        }
+
+        private void Form2_Load_1(object sender, EventArgs e)
         {
             DomainUpDown.DomainUpDownItemCollection collection = this.domainIsolLevl.Items;
             collection.Add("Read Uncommitted");
@@ -28,14 +42,6 @@ namespace logTempo
             collection.Add("Serializable");
 
             this.domainIsolLevl.Text = "Read Uncomitted";
-        }
-
-        private void btnAcessEnc_Click(object sender, EventArgs e)
-        {
-            nivel_isolamento = domainIsolLevl.Text;
-
-            Form3 form3 = new Form3();
-            form3.Show();
         }
     }
 }
