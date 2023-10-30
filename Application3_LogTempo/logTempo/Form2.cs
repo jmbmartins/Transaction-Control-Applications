@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,21 +12,30 @@ namespace logTempo
 {
     public partial class Form2 : Form
     {
+        public static string nivel_isolamento = "";
         public Form2()
         {
             InitializeComponent();
-            
         }
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            SqlConnection sqlConnection = new SqlConnection(Form1.Connection);
-            string query = "SELECT LO1.UserId, LO1.Objecto as EncId, DATEDIFF(SS,LO1.Valor, LO2.Valor) as Tempo FROM LogOperations LO1, LogOperations LO2 WHERE LO1.Referencia = LO2.Referencia and LO1.DCriacao < LO2.DCRiacao and LO1.Referencia = 'G1-20191001101356321' ";
+            DomainUpDown.DomainUpDownItemCollection collection = this.domainIsolLevl.Items;
+            collection.Add("Read Uncommitted");
+            collection.Add("Read Committed");
+            collection.Add("Repeatable Read");
+            collection.Add("Snapshot");
+            collection.Add("Serializable");
 
-            var sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
-            var dataTable = new DataTable();
-            sqlDataAdapter.Fill(dataTable);
-            dataGridView1.DataSource = dataTable;
+            this.domainIsolLevl.Text = "Read Uncomitted";
+        }
+
+        private void btnAcessEnc_Click(object sender, EventArgs e)
+        {
+            nivel_isolamento = domainIsolLevl.Text;
+
+            Form3 form3 = new Form3();
+            form3.Show();
         }
     }
 }

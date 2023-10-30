@@ -1,4 +1,7 @@
-﻿namespace logTempo
+﻿using System.Drawing;
+using System.Windows.Forms;
+
+namespace logTempo
 {
     partial class Form2
     {
@@ -28,34 +31,57 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.SuspendLayout();
+            labelIsolation = new Label();
+            domainIsolLevl = new DomainUpDown();
+            btnAcessEnc = new Button();
+            SuspendLayout();
             // 
-            // dataGridView1
+            // labelIsolation
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 137);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(776, 301);
-            this.dataGridView1.TabIndex = 0;
+            labelIsolation.AutoSize = true;
+            labelIsolation.Location = new Point(133, 79);
+            labelIsolation.Name = "labelIsolation";
+            labelIsolation.Size = new Size(99, 15);
+            labelIsolation.TabIndex = 1;
+            labelIsolation.Text = "Nivel de Isolação:";
+            // 
+            // domainIsolLevl
+            // 
+            domainIsolLevl.Location = new Point(253, 79);
+            domainIsolLevl.Margin = new Padding(3, 2, 3, 2);
+            domainIsolLevl.Name = "domainIsolLevl";
+            domainIsolLevl.Size = new Size(148, 23);
+            domainIsolLevl.TabIndex = 2;
+            domainIsolLevl.Text = "Select Isolation Level";
+            // 
+            // btnAcessEnc
+            // 
+            btnAcessEnc.Location = new Point(192, 164);
+            btnAcessEnc.Margin = new Padding(3, 2, 3, 2);
+            btnAcessEnc.Name = "btnAcessEnc";
+            btnAcessEnc.Size = new Size(82, 22);
+            btnAcessEnc.TabIndex = 4;
+            btnAcessEnc.Text = "Aceder";
+            btnAcessEnc.UseVisualStyleBackColor = true;
             // 
             // Form2
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.dataGridView1);
-            this.Name = "Form2";
-            this.Text = "Form2";
-            this.Load += new System.EventHandler(this.Form2_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(514, 291);
+            Controls.Add(btnAcessEnc);
+            Controls.Add(domainIsolLevl);
+            Controls.Add(labelIsolation);
+            Margin = new Padding(3, 2, 3, 2);
+            Name = "Form2";
+            Text = "Form2";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
-
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private Label labelIsolation;
+        private DomainUpDown domainIsolLevl;
+        private Button btnAcessEnc;
     }
 }

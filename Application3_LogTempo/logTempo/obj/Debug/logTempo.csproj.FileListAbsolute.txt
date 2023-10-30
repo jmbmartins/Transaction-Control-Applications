@@ -21,3 +21,4 @@ C:\Users\joaob\OneDrive\Ambiente de Trabalho\M1_1S\SSMS-ProjectTransactionsMEI_T
 C:\Users\joaob\OneDrive\Ambiente de Trabalho\M1_1S\SSMS-ProjectTransactionsMEI_TRAB\Application3_LogTempo\logTempo\obj\Debug\logTempo.csproj.CoreCompileInputs.cache
 C:\Users\joaob\OneDrive\Ambiente de Trabalho\M1_1S\SSMS-ProjectTransactionsMEI_TRAB\Application3_LogTempo\logTempo\obj\Debug\logTempo.exe
 C:\Users\joaob\OneDrive\Ambiente de Trabalho\M1_1S\SSMS-ProjectTransactionsMEI_TRAB\Application3_LogTempo\logTempo\obj\Debug\logTempo.pdb
+C:\Users\joaob\OneDrive\Ambiente de Trabalho\M1_1S\SSMS-ProjectTransactionsMEI_TRAB\Application3_LogTempo\logTempo\obj\Debug\logTempo.Form3.resources
