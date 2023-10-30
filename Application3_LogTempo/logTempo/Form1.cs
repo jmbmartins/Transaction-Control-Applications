@@ -17,7 +17,7 @@ namespace logTempo
         public Form1()
         {
             InitializeComponent();
-            database_name.Text = "ABD_TRAB1";
+            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -40,10 +40,20 @@ namespace logTempo
 
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            txtDB.Text = "MEI_TRAB";
+            cboServer.Items.Add(".");
+            cboServer.Items.Add("(local)");
+            cboServer.Items.Add(@".\SQLEXPRESS");
+            cboServer.Items.Add(string.Format(@"{0}\SQLEXPRESS", Environment.MachineName));
+            cboServer.SelectedIndex = 3;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             user = user_name.Text;
-            Connection = "Data Source=" + host_name.Text + "; Network Library=DBMSSOCN; Initial Catalog= "+database_name.Text+" ;User ID=" + user_name.Text + ";Password=" + password.Text + "";
+            Connection = string.Format("Data Source={0};Initial Catalog={1};User ID={2};Password={3};", cboServer.Text, txtDB.Text, user, password.Text);
 
             SqlConnection Connections = new SqlConnection(Connection);
 
