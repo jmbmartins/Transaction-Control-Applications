@@ -59,7 +59,7 @@ namespace Browser
                     {
                         Updater();
                     });
-                    Thread.Sleep(1);
+                    Thread.Sleep(1000);
                     if (second_table)
                     {
                         DataGridView2.Invoke((MethodInvoker)delegate
