@@ -220,6 +220,12 @@ namespace LoginApp
                 // Alterar a Quantidade
                 // Executa a consulta SQL para atualizar a quantidade na tabela EncLinha
                 string query = "UPDATE EncLinha SET Qtd = " + quantidade + " WHERE EncId = " + Form2.IdEnc + " AND ProdutoId = " + produtoId + ";";
+
+                if (connection.State != ConnectionState.Open)
+                {
+                    connection.Open(); // Abra a conexão se não estiver aberta
+                }
+
                 command.CommandText = query;
                 command.ExecuteNonQuery();
 
@@ -232,14 +238,14 @@ namespace LoginApp
             {
                 try
                 {
-                    MessageBox.Show("A transação de mudança de quantidade falhou, foi feito um rollback");
+                    Debug.WriteLine("A transação de mudança de quantidade falhou, foi feito um rollback: " + ex.Message);
                     Debug.WriteLine("Erro ao atualizar a quantidade: " + ex.Message);
                     transaction.Rollback();
                     connection.Close();
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Não foi possivél fazer rollback na transação de mudança de quantidade");
+                    Debug.WriteLine("Não foi possivél fazer rollback na transação de mudança de quantidade: " + ex.Message);
                     connection.Close();
                 }
             }
@@ -368,8 +374,7 @@ namespace LoginApp
                 {
                     if (transaction.Connection.State == ConnectionState.Open)
                     {
-                        transaction.Commit();
-                    }
+                        transaction.Commit();                    }
                     else
                     {
                         // A conexão não está aberta, não tente confirmar novamente.
