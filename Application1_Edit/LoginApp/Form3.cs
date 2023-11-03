@@ -352,8 +352,11 @@ namespace LoginApp
                 SqlCommand commandMorada = new SqlCommand(queryMorada, connection, transaction);
                 commandMorada.Parameters.AddWithValue("@Morada", morada);
                 commandMorada.Parameters.AddWithValue("@EncId", Form2.IdEnc);
+                if (connection.State != ConnectionState.Open)
+                {
+                    connection.Open(); // Abra a conexão se não estiver aberta
+                }
                 commandMorada.ExecuteNonQuery();
-
 
                 // Alterar a Quantidade
                 // Executa a consulta SQL para atualizar a quantidade na tabela EncLinha
@@ -361,50 +364,65 @@ namespace LoginApp
                 command.CommandText = query;
                 command.ExecuteNonQuery();
 
-                transaction.Commit();
+                if (transaction.Connection != null)
+                {
+                    if (transaction.Connection.State == ConnectionState.Open)
+                    {
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        // A conexão não está aberta, não tente confirmar novamente.
+                        MessageBox.Show("A conexão não está aberta.");
+                    }
+                }
+
                 MessageBox.Show("Alteração da quantidade foi feita com sucesso");
                 connection.Close();
-
             }
-            catch
+            catch (Exception ex)
             {
                 try
                 {
-                    MessageBox.Show("A transação da alteração da morada e da quantidade falhou, foi feito um rollback");
-                    transaction.Rollback();
+                    MessageBox.Show("A transação da alteração da morada e da quantidade falhou: " + ex.Message);
+                    if (transaction.Connection != null)
+                    {
+                        if (transaction.Connection.State == ConnectionState.Open)
+                        {
+                            transaction.Rollback();
+                        }
+                    }
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Não foi possivél fazer rollback na transação da alteração da morada e da quantidade ");
+                    MessageBox.Show("Não foi possível fazer rollback na transação da alteração da morada e da quantidade: " + ex.Message);
                 }
             }
 
-            //faz registo na base de dados
+            // Faz registro na base de dados
             connection.Open();
 
             string user = FormLogin.user;
             DateTime date_now = DateTime.UtcNow;
             string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
-            string ínsertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
+            string insertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
 
-            SqlCommand insertRegister = new SqlCommand(ínsertRegisterQuery, command.Connection);
+            SqlCommand insertRegister = new SqlCommand(insertRegisterQuery, connection);
             insertRegister.ExecuteNonQuery();
 
             connection.Close();
 
-
-            //Atualizar datagrid
+            // Atualizar datagrid
             SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
             string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
 
-            //dataGrid com o resultado da query
+            // DataGrid com o resultado da query
             var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
             var dataTable = new DataTable();
             sqlDataAdapter.Fill(dataTable);
             dataGridView1.DataSource = dataTable;
-
-
         }
+
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
