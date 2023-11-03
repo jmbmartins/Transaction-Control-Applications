@@ -431,9 +431,45 @@ namespace LoginApp
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Rollback in transaction.");
-            transaction.Rollback();
-            Application.ExitThread();
+            RollbackAndCloseForm();
         }
+
+        private void RollbackAndCloseForm()
+        {
+            try
+            {
+                // Faça o rollback da transação, se estiver ativa
+                if (transaction != null)
+                {
+                    if (transaction.Connection != null)
+                    {
+                        if (transaction.Connection.State == ConnectionState.Open)
+                        {
+                            transaction.Rollback();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Lide com qualquer exceção que ocorra durante o rollback, se necessário
+                MessageBox.Show("Erro durante o rollback: " + ex.Message);
+            }
+            finally
+            {
+                // Certifique-se de que a conexão está fechada
+                if (sqlConnection != null)
+                {
+                    if (sqlConnection.State == ConnectionState.Open)
+                    {
+                        sqlConnection.Close();
+                    }
+                }
+
+                // Feche o formulário
+                this.Close();
+            }
+        }
+
     }
 }
