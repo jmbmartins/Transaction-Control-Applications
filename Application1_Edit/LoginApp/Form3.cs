@@ -205,7 +205,7 @@ namespace LoginApp
             }
             else if (produtoEditado)
             {
-                AtualizarQuantidade(produtoId, quantidade, sqlConnection, transaction, command);
+                AtualizarQuantidade(produtoId, quantidade, sqlConnection, command);
             }
             else
             {
@@ -213,26 +213,35 @@ namespace LoginApp
             }
         }
 
-        private void AtualizarQuantidade(int produtoId, int quantidade, SqlConnection connection, SqlTransaction transaction, SqlCommand command)
+        private void AtualizarQuantidade(int produtoId, int quantidade, SqlConnection connection, SqlCommand command)
         {
+            SqlTransaction transaction = null;
             try
             {
-                // Alterar a Quantidade
-                // Executa a consulta SQL para atualizar a quantidade na tabela EncLinha
-                string query = "UPDATE EncLinha SET Qtd = " + quantidade + " WHERE EncId = " + Form2.IdEnc + " AND ProdutoId = " + produtoId + ";";
-
                 if (connection.State != ConnectionState.Open)
                 {
-                    connection.Open(); // Abra a conexão se não estiver aberta
+                    connection.Open(); // Open the connection if it's not already open
                 }
 
+                // Start a new transaction
+                transaction = connection.BeginTransaction();
+                command.Transaction = transaction;
+
+                // Alter the Quantity
+                // Execute the SQL query to update the quantity in the EncLinha table
+                string query = "UPDATE EncLinha SET Qtd = @quantidade WHERE EncId = @encId AND ProdutoId = @produtoId";
                 command.CommandText = query;
+
+                // Use parameterized queries to prevent SQL injection
+                command.Parameters.AddWithValue("@quantidade", quantidade);
+                command.Parameters.AddWithValue("@encId", Form2.IdEnc);
+                command.Parameters.AddWithValue("@produtoId", produtoId);
+
                 command.ExecuteNonQuery();
 
+                // Commit the transaction
                 transaction.Commit();
                 MessageBox.Show("Alteração da quantidade foi feita com sucesso");
-                connection.Close();
-
             }
             catch (Exception ex)
             {
@@ -240,15 +249,21 @@ namespace LoginApp
                 {
                     Debug.WriteLine("A transação de mudança de quantidade falhou, foi feito um rollback: " + ex.Message);
                     Debug.WriteLine("Erro ao atualizar a quantidade: " + ex.Message);
-                    transaction.Rollback();
-                    connection.Close();
+                    transaction?.Rollback(); // Rollback the transaction if it's not null
                 }
-                catch (Exception)
+                catch (Exception rollbackEx)
                 {
-                    Debug.WriteLine("Não foi possivél fazer rollback na transação de mudança de quantidade: " + ex.Message);
-                    connection.Close();
+                    Debug.WriteLine("Não foi possível fazer rollback na transação de mudança de quantidade: " + rollbackEx.Message);
                 }
             }
+            finally
+            {
+                transaction?.Dispose(); // Dispose of the transaction to release resources
+
+                // Close the connection
+                connection.Close();
+            }
+
 
 
             //faz registo na base de dados
