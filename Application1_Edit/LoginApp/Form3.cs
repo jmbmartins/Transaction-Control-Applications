@@ -6,8 +6,10 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -18,7 +20,7 @@ namespace LoginApp
         SqlConnection sqlConnection;
         SqlTransaction transaction;
         SqlCommand command;
-
+        System.Data.IsolationLevel isoLvl;
         public Form3()
         {
             InitializeComponent();
@@ -65,41 +67,57 @@ namespace LoginApp
                         switch (nivel_isolamento)
                         {
                             case "Read Uncommitted":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
+                                isoLvl = System.Data.IsolationLevel.ReadUncommitted;
                                 break;
 
                             case "Read Committed":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
+                                isoLvl = System.Data.IsolationLevel.ReadCommitted;
                                 break;
 
                             case "Repeatable Read":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.RepeatableRead);
-
+                                isoLvl = System.Data.IsolationLevel.RepeatableRead;
                                 break;
 
                             case "Snapshot":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.Snapshot);
-
+                                isoLvl = System.Data.IsolationLevel.Snapshot;
                                 break;
 
                             case "Serializable":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.Serializable);
-
+                                isoLvl = System.Data.IsolationLevel.Serializable;
                                 break;
                             default:
-                                transaction = sqlConnection.BeginTransaction();
+                                isoLvl = System.Data.IsolationLevel.ReadUncommitted;
                                 break;
                         }
+                        transaction = sqlConnection.BeginTransaction(isoLvl);
 
+                        command = sqlConnection.CreateCommand();
                         command.Connection = sqlConnection;
-                        command.Transaction = transaction;
+                        command.Transaction = transaction; // Set the transaction before executing the query
+                        try
+                        {
+                            string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
+                            Debug.WriteLine("SQL Query: " + query);
+
+                           
+
+                            SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
+                            var dataTable = new DataTable();
+                            sqlDataAdapter.Fill(dataTable);
+                            dataGridView1.DataSource = dataTable;
+
+                            Debug.WriteLine("SQL Query executed successfully.");
+                        }
+                        catch (SqlException ex)
+                        {
+                            Debug.WriteLine("SQL Exception: " + ex.Message);
+                            // Lide com exceções do SQL
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
+                            // Lide com exceções gerais
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -121,35 +139,6 @@ namespace LoginApp
                 // Handle general exceptions
                 Debug.WriteLine("An error occurred: " + ex.Message);
                 // Optionally, you can display an error message to the user here.
-            }
-
-            try
-            {
-                string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
-                Debug.WriteLine("SQL Query: " + query);
-
-                if (sqlConnection.ConnectionString != FormLogin.connectionString)
-                {
-                    // Configurar a cadeia de conexão se necessário
-                    sqlConnection.ConnectionString = FormLogin.connectionString;
-                }
-
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
-                var dataTable = new DataTable();
-                sqlDataAdapter.Fill(dataTable);
-                dataGridView1.DataSource = dataTable;
-
-                Debug.WriteLine("SQL Query executed successfully.");
-            }
-            catch (SqlException ex)
-            {
-                Debug.WriteLine("SQL Exception: " + ex.Message);
-                // Lide com exceções do SQL
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
-                // Lide com exceções gerais
             }
 
         }
