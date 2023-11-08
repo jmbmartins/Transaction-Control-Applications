@@ -34,11 +34,13 @@ namespace LoginApp
                 Debug.WriteLine("Form3_Load_1 called."); // Add this line for debugging
 
                 string nivel_isolamento = Form2.nivel_isolamento;
+                // Set the connection string before creating the SqlConnection object
+                string connectionString = FormLogin.connectionString;
 
-                Debug.WriteLine("Connection string: " + FormLogin.connectionString); // Debug the connection string
+                Debug.WriteLine("Connection string: " + connectionString); // Debug the connection string
 
                 // Initialize the sqlConnection here
-                sqlConnection = new SqlConnection(FormLogin.connectionString);
+                sqlConnection = new SqlConnection(connectionString);
 
                 Debug.WriteLine("SqlConnection object created.");
 
@@ -94,14 +96,19 @@ namespace LoginApp
                         command = sqlConnection.CreateCommand();
                         command.Connection = sqlConnection;
                         command.Transaction = transaction; // Set the transaction before executing the query
+
                         try
                         {
                             string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
                             Debug.WriteLine("SQL Query: " + query);
 
-                           
+                            if (sqlConnection.State != ConnectionState.Open)
+                            {
+                                sqlConnection.Open(); // Open the connection if it's not already open
+                            }
 
                             SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
+                            sqlDataAdapter.SelectCommand.Transaction = transaction; // Assign the transaction to the SelectCommand
                             var dataTable = new DataTable();
                             sqlDataAdapter.Fill(dataTable);
                             dataGridView1.DataSource = dataTable;
@@ -111,12 +118,12 @@ namespace LoginApp
                         catch (SqlException ex)
                         {
                             Debug.WriteLine("SQL Exception: " + ex.Message);
-                            // Lide com exceções do SQL
+                            // Handle SQL exceptions
                         }
                         catch (Exception ex)
                         {
                             Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
-                            // Lide com exceções gerais
+                            // Handle general exceptions
                         }
                     }
                     catch (Exception ex)
