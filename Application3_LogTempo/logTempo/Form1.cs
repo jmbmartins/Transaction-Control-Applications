@@ -13,11 +13,11 @@ namespace logTempo
 {
     public partial class Form1 : Form
     {
-        public static string Connection = "", user = "";
+        public static string databaseConnectionString = "", user = "";
         public Form1()
         {
             InitializeComponent();
-            
+            this.Name = "Login";
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -46,29 +46,29 @@ namespace logTempo
             cboServer.Items.Add(".");
             cboServer.Items.Add("(local)");
             cboServer.Items.Add(@".\SQLEXPRESS");
-            cboServer.Items.Add(string.Format(@"{0}\SQLEXPRESS", Environment.MachineName));
+            cboServer.Items.Add(string.Format(@"{0}", Environment.MachineName));
             cboServer.SelectedIndex = 3;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             user = user_name.Text;
-            Connection = string.Format("Data Source={0};Initial Catalog={1};User ID={2};Password={3};", cboServer.Text, txtDB.Text, user, password.Text);
+            databaseConnectionString = string.Format("Data Source={0};Initial Catalog={1};User ID={2};Password={3};", cboServer.Text, txtDB.Text, user, password.Text);
 
-            SqlConnection Connections = new SqlConnection(Connection);
+            SqlConnection Connections = new SqlConnection(databaseConnectionString);
 
             try
             {
                 Connections.Open();
-                MessageBox.Show("Success.......");
+                
                 Connections.Close();
                 Form2 form2 = new Form2();
                 form2.Show();
             }
-            catch
-            {
-                MessageBox.Show("Erro.......");
+            catch (Exception ex) { 
+                MessageBox.Show("erro: "+ex.Message);
             }
+           
         }
     }
 }
