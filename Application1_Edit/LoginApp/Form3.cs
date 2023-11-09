@@ -18,6 +18,7 @@ namespace LoginApp
         SqlConnection sqlConnection;
         SqlTransaction transaction;
         SqlCommand command;
+        IsolationLevel isolationLevel;
 
         public Form3()
         {
@@ -65,41 +66,67 @@ namespace LoginApp
                         switch (nivel_isolamento)
                         {
                             case "Read Uncommitted":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
+;                                isolationLevel = IsolationLevel.ReadUncommitted;
                                 break;
 
                             case "Read Committed":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
+                                isolationLevel = IsolationLevel.ReadCommitted;
                                 break;
 
                             case "Repeatable Read":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.RepeatableRead);
-
+                                isolationLevel = IsolationLevel.RepeatableRead;
                                 break;
-
-                            case "Snapshot":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.Snapshot);
-
-                                break;
-
                             case "Serializable":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.Serializable);
-
+                                isolationLevel = IsolationLevel.Serializable;
                                 break;
                             default:
-                                transaction = sqlConnection.BeginTransaction();
+                                isolationLevel = IsolationLevel.ReadCommitted;
                                 break;
                         }
 
-                        command.Connection = sqlConnection;
-                        command.Transaction = transaction;
+                        using (transaction = sqlConnection.BeginTransaction(isolationLevel))
+                        {
+                            try
+                            {
+                                command.Connection = sqlConnection;
+                                command.Transaction = transaction;
+
+
+                                string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
+                                Debug.WriteLine("SQL Query: " + query);
+
+                                // Create SqlCommand
+                                using (SqlCommand sqlCommand = new SqlCommand(query, sqlConnection, transaction))
+                                {
+                                    using (SqlDataReader reader = sqlCommand.ExecuteReader())
+                                    {
+                                        var dataTable = new DataTable();
+                                        dataTable.Load(reader);
+                                        dataGridView1.DataSource = dataTable;
+                                    }
+                                }
+
+                                Debug.WriteLine("SQL Query executed successfully.");
+                            }
+                            catch (SqlException ex)
+                            {
+                                Debug.WriteLine("SQL Exception: " + ex.Message);
+                                // Handle SQL exceptions
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
+                                // Handle general exceptions
+                            }
+                            finally
+                            {
+                                // Check if the connection is open before trying to close it
+                                if (sqlConnection.State != ConnectionState.Closed)
+                                {
+                                    sqlConnection.Close();
+                                }
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -122,36 +149,6 @@ namespace LoginApp
                 Debug.WriteLine("An error occurred: " + ex.Message);
                 // Optionally, you can display an error message to the user here.
             }
-
-            try
-            {
-                string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
-                Debug.WriteLine("SQL Query: " + query);
-
-                if (sqlConnection.ConnectionString != FormLogin.connectionString)
-                {
-                    // Configurar a cadeia de conexão se necessário
-                    sqlConnection.ConnectionString = FormLogin.connectionString;
-                }
-
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
-                var dataTable = new DataTable();
-                sqlDataAdapter.Fill(dataTable);
-                dataGridView1.DataSource = dataTable;
-
-                Debug.WriteLine("SQL Query executed successfully.");
-            }
-            catch (SqlException ex)
-            {
-                Debug.WriteLine("SQL Exception: " + ex.Message);
-                // Lide com exceções do SQL
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
-                // Lide com exceções gerais
-            }
-
         }
 
 
