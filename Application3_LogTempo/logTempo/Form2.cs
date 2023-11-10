@@ -37,7 +37,8 @@ namespace logTempo
             DomainUpDown.DomainUpDownItemCollection collection = this.domainIsolLevl.Items;
             collection.Add("Read Uncommitted");
             collection.Add("Read Committed");
-            collection.Add("Read Committed");
+            collection.Add("Repeatable Read");
+            collection.Add("Snapshot");
             collection.Add("Serializable");
 
             this.domainIsolLevl.Text = "Read Uncomitted";
