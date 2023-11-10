@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "A6jt2LNUebpZwq7zWuJkjAB5Ogitfw6OPbZdW0mWtcFwSlKKt+b2DT/oxD2jRUcSWxUblSCet1VVU+PyNBI0BA==",
+  "dgSpecHash": "bV6AivwxxQdiJtnux2JCXojTwhMT+wm6FsyGwgjWXSXbwruToTfW80VR2WyXo1uwfDBAPyQIUQl7PQ10dCJILQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\joaob\\OneDrive\\Ambiente de Trabalho\\M1_1S\\SSMS-ProjectTransactionsMEI_TRAB\\Application1_Edit\\LoginApp\\LoginApp.csproj",
+  "projectFilePath": "C:\\Users\\joaob\\OneDrive\\Ambiente de Trabalho\\M1_1S\\ssms\\SSMS-ProjectTransactions\\Application1_Edit\\LoginApp\\LoginApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\joaob\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\joaob\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
