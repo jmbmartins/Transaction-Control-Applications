@@ -49,8 +49,6 @@ namespace LoginApp
                         {
                             case "Read Uncommitted":
                                 isolationLevel = IsolationLevel.ReadUncommitted;
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
                                 break;
 
                             case "Read Committed":
@@ -58,15 +56,16 @@ namespace LoginApp
                                 break;
 
                             case "Repeatable Read":
-
+                                isolationLevel = IsolationLevel.RepeatableRead;
                                 break;
 
                             case "Serializable":
                                 isolationLevel = IsolationLevel.Serializable;
-                                isolationLevel = IsolationLevel.ReadUncommitted;
-                            default:
-                                transaction = sqlConnection.BeginTransaction();
                                 break;
+                            default:
+                                isolationLevel = IsolationLevel.ReadUncommitted;
+                                break;
+                        }
                         Debug.WriteLine("Attempting to open the connection.");
 
                         sqlConnection.Open(); // Attempt to open the connection
