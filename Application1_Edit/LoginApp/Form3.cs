@@ -18,6 +18,7 @@ namespace LoginApp
         SqlConnection sqlConnection;
         SqlTransaction transaction;
         SqlCommand command;
+        IsolationLevel isolationLevel;
 
         public Form3()
         {
@@ -44,6 +45,28 @@ namespace LoginApp
                 {
                     try
                     {
+                        switch (nivel_isolamento)
+                        {
+                            case "Read Uncommitted":
+                                isolationLevel = IsolationLevel.ReadUncommitted;
+                                break;
+
+                            case "Read Committed":
+                                isolationLevel = IsolationLevel.ReadCommitted;
+                                break;
+
+                            case "Repeatable Read":
+                                isolationLevel = IsolationLevel.RepeatableRead;
+                                break;
+
+                            case "Serializable":
+                                isolationLevel = IsolationLevel.Serializable;
+                                break;
+                            default:
+                                isolationLevel = IsolationLevel.ReadUncommitted;
+                                break;
+                        }
+
                         Debug.WriteLine("Attempting to open the connection.");
 
                         sqlConnection.Open(); // Attempt to open the connection
@@ -52,61 +75,60 @@ namespace LoginApp
                         {
                             // Connection was successfully opened
                             Debug.WriteLine("Connection successfully opened.");
+
+                            using (transaction = sqlConnection.BeginTransaction(isolationLevel))
+                            {
+                                try
+                                {
+                                    command = sqlConnection.CreateCommand();
+                                    command.Connection = sqlConnection;
+                                    command.Transaction = transaction;
+
+                                    string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = @IdEnc;";
+                                    command.CommandText = query;
+                                    command.Parameters.AddWithValue("@IdEnc", Form2.IdEnc); // Assuming Form2.IdEnc is an integer
+
+                                    Debug.WriteLine("SQL Query: " + query);
+
+                                    SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
+                                    sqlDataAdapter.SelectCommand = command;
+
+                                    var dataTable = new DataTable();
+                                    sqlDataAdapter.Fill(dataTable);
+                                    dataGridView1.DataSource = dataTable;
+
+                                    Debug.WriteLine("SQL Query executed successfully.");
+
+                                    transaction.Commit(); // Commit the transaction after successful execution
+                                }
+                                catch (SqlException ex)
+                                {
+                                    Debug.WriteLine("SQL Exception: " + ex.Message);
+                                    // Handle SQL exceptions
+                                    transaction.Rollback(); // Rollback the transaction in case of SQL exceptions
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
+                                    // Handle general exceptions
+                                    transaction.Rollback(); // Rollback the transaction in case of general exceptions
+                                }
+                            }
                         }
                         else
                         {
                             // Connection is not in the expected open state
-                            Debug.WriteLine("Begin Transaction: Connection is not open as expected.");
+                            Debug.WriteLine("Connection is not open as expected.");
                             // Handle this situation or display an error message to the user
                         }
-
-                        command = sqlConnection.CreateCommand();
-
-                        switch (nivel_isolamento)
-                        {
-                            case "Read Uncommitted":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                                break;
-
-                            case "Read Committed":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                                break;
-
-                            case "Repeatable Read":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.RepeatableRead);
-
-                                break;
-
-                            case "Snapshot":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.Snapshot);
-
-                                break;
-
-                            case "Serializable":
-
-                                transaction = sqlConnection.BeginTransaction(IsolationLevel.Serializable);
-
-                                break;
-                            default:
-                                transaction = sqlConnection.BeginTransaction();
-                                break;
-                        }
-
-                        command.Connection = sqlConnection;
-                        command.Transaction = transaction;
                     }
                     catch (Exception ex)
                     {
                         // Handle exceptions that may occur during the connection attempt
-                        Debug.WriteLine("Begin Transaction: An error occurred: " + ex.Message);
+                        Debug.WriteLine("An error occurred: " + ex.Message);
                         // Optionally, display an error message to the user.
                     }
+
                 }
 
             }
@@ -121,35 +143,6 @@ namespace LoginApp
                 // Handle general exceptions
                 Debug.WriteLine("An error occurred: " + ex.Message);
                 // Optionally, you can display an error message to the user here.
-            }
-
-            try
-            {
-                string query = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
-                Debug.WriteLine("SQL Query: " + query);
-
-                if (sqlConnection.ConnectionString != FormLogin.connectionString)
-                {
-                    // Configurar a cadeia de conexão se necessário
-                    sqlConnection.ConnectionString = FormLogin.connectionString;
-                }
-
-                SqlDataAdapter sqlDataAdapter = new SqlDataAdapter(query, sqlConnection);
-                var dataTable = new DataTable();
-                sqlDataAdapter.Fill(dataTable);
-                dataGridView1.DataSource = dataTable;
-
-                Debug.WriteLine("SQL Query executed successfully.");
-            }
-            catch (SqlException ex)
-            {
-                Debug.WriteLine("SQL Exception: " + ex.Message);
-                // Lide com exceções do SQL
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("An error occurred while executing the SQL query: " + ex.Message);
-                // Lide com exceções gerais
             }
 
         }
@@ -197,15 +190,15 @@ namespace LoginApp
             // Verificar as condições especificadas
             if (moradaEditada && produtoEditado)
             {
-                AtualizarMoradaEQuantidade(txtBoxMorada.Text, produtoId, quantidade, sqlConnection, transaction, command);
+                AtualizarMoradaEQuantidade(txtBoxMorada.Text, produtoId, quantidade);
             }
             else if (moradaEditada)
             {
-                AtualizarMorada(txtBoxMorada.Text, sqlConnection, transaction, command);
+                AtualizarMorada(txtBoxMorada.Text);
             }
             else if (produtoEditado)
             {
-                AtualizarQuantidade(produtoId, quantidade, sqlConnection, transaction, command);
+                AtualizarQuantidade(produtoId, quantidade);
             }
             else
             {
@@ -213,234 +206,233 @@ namespace LoginApp
             }
         }
 
-        private void AtualizarQuantidade(int produtoId, int quantidade, SqlConnection connection, SqlTransaction transaction, SqlCommand command)
+        private void AtualizarQuantidade(int produtoId, int quantidade)
         {
-            try
+            using (SqlConnection connection = new SqlConnection(FormLogin.connectionString))
             {
-                // Execute the SQL query to update the quantity in the EncLinha table
-                string query = "UPDATE EncLinha SET Qtd = @quantidade WHERE EncId = @encId AND ProdutoId = @produtoId";
-                // Use parameterized queries to prevent SQL injection
-                command.Parameters.AddWithValue("@quantidade", quantidade);
-                command.Parameters.AddWithValue("@encId", Form2.IdEnc);
-                command.Parameters.AddWithValue("@produtoId", produtoId);
-
-    
-
-                if (connection.State != ConnectionState.Open)
+                using (SqlCommand command = connection.CreateCommand())
                 {
-                    connection.Open(); // Abra a conexão se não estiver aberta
-                }
-
-                command.CommandText = query;
-                command.ExecuteNonQuery();
-
-                // Se a transação ainda está ativa, execute o commit
-                if (transaction.Connection != null && transaction.Connection.State == ConnectionState.Open)
-                {
-                    transaction.Commit();
-                    MessageBox.Show("Alteração da morada foi feita com sucesso");
-                }
-            }
-            catch
-            {
-                try
-                {
-                    // Tratar erro de commit
-                    MessageBox.Show("Erro ao confirmar a transação da alteração da quantidade");
-                }
-                finally
-                {
-                    if (transaction.Connection != null && transaction.Connection.State == ConnectionState.Open)
+                    SqlTransaction transaction = null;
+                    try
                     {
-                        transaction.Rollback();
-                        MessageBox.Show("A transação da alteração da morada falhou e foi feito um rollback");
+                        connection.Open(); // Open the connection
+
+                        transaction = connection.BeginTransaction(isolationLevel);
+                        command.Transaction = transaction;
+
+                        // Execute the SQL query to update the quantity in the EncLinha table
+                        string query = "UPDATE EncLinha SET Qtd = @quantidade WHERE EncId = @encId AND ProdutoId = @produtoId";
+
+                        command.CommandText = query;
+                        command.Parameters.AddWithValue("@quantidade", quantidade);
+                        command.Parameters.AddWithValue("@encId", Form2.IdEnc);
+                        command.Parameters.AddWithValue("@produtoId", produtoId);
+
+                        command.ExecuteNonQuery();
+
+                        transaction.Commit();
+                        MessageBox.Show("Alteração da quantidade foi feita com sucesso");
                     }
-                }
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close(); // Certifique-se de fechar a conexão após o uso
-                }
-            }
-          
-
-            //faz registo na base de dados
-            connection.Open();
-            string user = FormLogin.user;
-            DateTime date_now = DateTime.UtcNow;
-            string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
-            string ínsertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
-
-            SqlCommand insertRegister = new SqlCommand(ínsertRegisterQuery, command.Connection);
-            insertRegister.ExecuteNonQuery();
-            connection.Close();
-
-            //Atualizar a datagrid
-            SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
-            string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
-
-            //dataGrid com o resultado da query
-            var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
-            var dataTable = new DataTable();
-            sqlDataAdapter.Fill(dataTable);
-            dataGridView1.DataSource = dataTable;
-            connection.Close();
-
-        }
-
-        private void AtualizarMorada(string morada, SqlConnection connection, SqlTransaction transaction, SqlCommand command)
-        {
-            try
-            {
-                // Alterar a Morada da Encomenda
-                string query = "UPDATE Encomenda SET Morada = '" + morada + "' WHERE Encomenda.EncID = " + Form2.IdEnc + " ;";
-
-                if (connection.State != ConnectionState.Open)
-                {
-                    connection.Open(); // Abra a conexão se não estiver aberta
-                }
-
-                command.CommandText = query;
-                command.ExecuteNonQuery();
-
-                // Se a transação ainda está ativa, execute o commit
-                if (transaction.Connection != null && transaction.Connection.State == ConnectionState.Open)
-                {
-                    transaction.Commit();
-                    MessageBox.Show("Alteração da morada foi feita com sucesso");
-                }
-            }
-            catch
-            {
-                try
-                {
-                    // Tratar erro de commit
-                    MessageBox.Show("Erro ao confirmar a transação da alteração da morada");
-                }
-                finally
-                {
-                    if (transaction.Connection != null && transaction.Connection.State == ConnectionState.Open)
+                    catch (Exception ex)
                     {
-                        transaction.Rollback();
-                        MessageBox.Show("A transação da alteração da morada falhou e foi feito um rollback");
-                    }
-                }
-            }
-            finally
-            {
-                if (connection.State == ConnectionState.Open)
-                {
-                    connection.Close(); // Certifique-se de fechar a conexão após o uso
-                }
-            }
-
-
-            //faz registo na base de dados
-            connection.Open();
-
-            string user = FormLogin.user;
-            DateTime date_now = DateTime.UtcNow;
-            string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
-            string ínsertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
-
-            SqlCommand insertRegister = new SqlCommand(ínsertRegisterQuery, command.Connection);
-            insertRegister.ExecuteNonQuery();
-
-            connection.Close();
-
-
-            //Atualizar datagrid
-            SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
-            string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
-
-            //dataGrid com o resultado da query
-            var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
-            var dataTable = new DataTable();
-            sqlDataAdapter.Fill(dataTable);
-            dataGridView1.DataSource = dataTable;
-        }
-
-
-        private void AtualizarMoradaEQuantidade(string morada, int produtoId, int quantidade, SqlConnection connection, SqlTransaction transaction, SqlCommand command)
-        {
-            Debug.WriteLine("Op Alterar Quantidade / Morada : Morada: " + morada + "ProdutoID: " + produtoId + " Qtd: " + quantidade);
-            try
-            {
-                // Executa a consulta SQL para atualizar a morada na tabela Encomenda
-                string queryMorada = "UPDATE Encomenda SET Morada = @Morada WHERE EncId = @EncId";
-                SqlCommand commandMorada = new SqlCommand(queryMorada, connection, transaction);
-                commandMorada.Parameters.AddWithValue("@Morada", morada);
-                commandMorada.Parameters.AddWithValue("@EncId", Form2.IdEnc);
-                if (connection.State != ConnectionState.Open)
-                {
-                    connection.Open(); // Abra a conexão se não estiver aberta
-                }
-                commandMorada.ExecuteNonQuery();
-
-                // Alterar a Quantidade
-                // Executa a consulta SQL para atualizar a quantidade na tabela EncLinha
-                string query = "UPDATE EncLinha SET Qtd = " + quantidade + " WHERE EncId = " + Form2.IdEnc + " AND ProdutoId = " + produtoId + ";";
-                command.CommandText = query;
-                command.ExecuteNonQuery();
-
-                if (transaction.Connection != null)
-                {
-                    if (transaction.Connection.State == ConnectionState.Open)
-                    {
-                        transaction.Commit();                    }
-                    else
-                    {
-                        // A conexão não está aberta, não tente confirmar novamente.
-                        MessageBox.Show("A conexão não está aberta.");
-                    }
-                }
-
-                MessageBox.Show("Alteração da quantidade foi feita com sucesso");
-                connection.Close();
-            }
-            catch (Exception ex)
-            {
-                try
-                {
-                    MessageBox.Show("A transação da alteração da morada e da quantidade falhou: " + ex.Message);
-                    if (transaction.Connection != null)
-                    {
-                        if (transaction.Connection.State == ConnectionState.Open)
+                        try
                         {
-                            transaction.Rollback();
+                            MessageBox.Show("Erro ao confirmar a transação da alteração da quantidade: " + ex.Message);
+                            Debug.Write("Erro ao confirmar a transação da alteração da quantidade: " + ex.Message);
+                            transaction?.Rollback();
+                        }
+                        catch (Exception rollbackEx)
+                        {
+                            // Handle rollback exception if needed
+                            Debug.Write("Rollback Exception: " + rollbackEx.Message);
                         }
                     }
+                    finally
+                    {
+                        connection.Close(); // Close the connection
+                    }
                 }
-                catch (Exception)
+                //faz registo na base de dados
+                connection.Open();
+                string user = FormLogin.user;
+                DateTime date_now = DateTime.UtcNow;
+                string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
+                string ínsertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
+
+                SqlCommand insertRegister = new SqlCommand(ínsertRegisterQuery, connection);
+                insertRegister.ExecuteNonQuery();
+                connection.Close();
+
+                //Atualizar a datagrid
+                SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
+                string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
+
+                //dataGrid com o resultado da query
+                var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
+                var dataTable = new DataTable();
+                sqlDataAdapter.Fill(dataTable);
+                dataGridView1.DataSource = dataTable;
+                connection.Close();
+            }
+        }
+
+        private void AtualizarMorada(string morada)
+        {
+            using (SqlConnection connection = new SqlConnection(FormLogin.connectionString))
+            {
+                using (SqlCommand command = connection.CreateCommand())
                 {
-                    MessageBox.Show("Não foi possível fazer rollback na transação da alteração da morada e da quantidade: " + ex.Message);
+                    SqlTransaction transaction = null;
+                    try
+                    {
+                        connection.Open(); // Open the connection
+
+                        transaction = connection.BeginTransaction(isolationLevel);
+                        command.Transaction = transaction;
+
+                        // Alterar a Morada da Encomenda
+                        string query = "UPDATE Encomenda SET Morada = @morada WHERE Encomenda.EncID = @encId";
+                        command.CommandText = query;
+                        command.Parameters.AddWithValue("@morada", morada);
+                        command.Parameters.AddWithValue("@encId", Form2.IdEnc);
+
+                        command.ExecuteNonQuery();
+
+                        transaction.Commit();
+                        MessageBox.Show("Alteração da morada foi feita com sucesso");
+                    }
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            MessageBox.Show("Erro ao confirmar a transação da alteração da morada: " + ex.Message);
+                            Debug.Write("Erro ao confirmar a transação da alteração da morada: " + ex.Message);
+                            transaction?.Rollback();
+                        }
+                        catch (Exception rollbackEx)
+                        {
+                            // Handle rollback exception if needed
+                            Debug.Write("Rollback Exception: " + rollbackEx.Message);
+                        }
+                    }
+                    finally
+                    {
+                        connection.Close(); // Close the connection
+                    }
+
+                    //faz registo na base de dados
+                    connection.Open();
+
+                    string user = FormLogin.user;
+                    DateTime date_now = DateTime.UtcNow;
+                    string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
+                    string ínsertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
+
+                    SqlCommand insertRegister = new SqlCommand(ínsertRegisterQuery, connection);
+                    insertRegister.ExecuteNonQuery();
+
+                    connection.Close();
+
+
+                    //Atualizar datagrid
+                    SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
+                    string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
+
+                    //dataGrid com o resultado da query
+                    var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
+                    var dataTable = new DataTable();
+                    sqlDataAdapter.Fill(dataTable);
+                    dataGridView1.DataSource = dataTable;
+
                 }
             }
+        }
 
-            // Faz registro na base de dados
-            connection.Open();
+        private void AtualizarMoradaEQuantidade(string morada, int produtoId, int quantidade)
+        {
+            using (SqlConnection connection = new SqlConnection(FormLogin.connectionString))
+            {
+                using (SqlCommand command = connection.CreateCommand())
+                {
+                    SqlTransaction transaction = null;
+                    try
+                    {
+                        connection.Open(); // Open the connection
 
-            string user = FormLogin.user;
-            DateTime date_now = DateTime.UtcNow;
-            string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
-            string insertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
+                        transaction = connection.BeginTransaction(isolationLevel);
+                        command.Transaction = transaction;
 
-            SqlCommand insertRegister = new SqlCommand(insertRegisterQuery, connection);
-            insertRegister.ExecuteNonQuery();
+                        // Alterar a Morada da Encomenda
+                        string queryM = "UPDATE Encomenda SET Morada = @morada WHERE Encomenda.EncID = @encId";
+                        command.CommandText = queryM;
+                        command.Parameters.AddWithValue("@morada", morada);
+                        command.Parameters.AddWithValue("@encId", Form2.IdEnc);
 
-            connection.Close();
+                        command.ExecuteNonQuery();
 
-            // Atualizar datagrid
-            SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
-            string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
+                        // Clear parameters before using the same command for a different query
+                        command.Parameters.Clear();
 
-            // DataGrid com o resultado da query
-            var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
-            var dataTable = new DataTable();
-            sqlDataAdapter.Fill(dataTable);
-            dataGridView1.DataSource = dataTable;
+                        // Execute the SQL query to update the quantity in the EncLinha table
+                        string queryQ = "UPDATE EncLinha SET Qtd = @quantidade WHERE EncId = @encId AND ProdutoId = @produtoId";
+
+                        command.CommandText = queryQ;
+                        command.Parameters.AddWithValue("@quantidade", quantidade);
+                        command.Parameters.AddWithValue("@encId", Form2.IdEnc);
+                        command.Parameters.AddWithValue("@produtoId", produtoId);
+
+                        command.ExecuteNonQuery();
+
+
+
+                        transaction.Commit();
+                        MessageBox.Show("Alteração da morada e da quantidade foi feita com sucesso");
+                    }
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            MessageBox.Show("Erro ao confirmar a transação da alteração da morada e quantidade: " + ex.Message);
+                            Debug.Write("Erro ao confirmar a transação da alteração da morada e quantidade: " + ex.Message);
+                            transaction?.Rollback();
+                        }
+                        catch (Exception rollbackEx)
+                        {
+                            // Handle rollback exception if needed
+                            Debug.Write("Rollback Exception: " + rollbackEx.Message);
+                        }
+                    }
+                    finally
+                    {
+                        connection.Close(); // Close the connection
+                    }
+
+                    //faz registo na base de dados
+                    connection.Open();
+
+                    string user = FormLogin.user;
+                    DateTime date_now = DateTime.UtcNow;
+                    string User_Reference = "G1-" + date_now.ToString("yyMMddHmmss");
+                    string ínsertRegisterQuery = "INSERT INTO LogOperations (EventType, Objecto, Valor, Referencia) Values('O', '" + Form2.IdEnc + "'" + " , " + "'" + date_now + "'" + " , " + "'" + User_Reference + "'" + ")";
+
+                    SqlCommand insertRegister = new SqlCommand(ínsertRegisterQuery, connection);
+                    insertRegister.ExecuteNonQuery();
+
+                    connection.Close();
+
+
+                    //Atualizar datagrid
+                    SqlConnection sqlConnection = new SqlConnection(FormLogin.connectionString);
+                    string selectAll = "SELECT * FROM EncLinha FULL JOIN Encomenda ON EncLinha.EncId = Encomenda.EncID WHERE EncLinha.EncId = " + Form2.IdEnc + ";";
+
+                    //dataGrid com o resultado da query
+                    var sqlDataAdapter = new SqlDataAdapter(selectAll, sqlConnection);
+                    var dataTable = new DataTable();
+                    sqlDataAdapter.Fill(dataTable);
+                    dataGridView1.DataSource = dataTable;
+
+                }
+            }
         }
 
 
