@@ -7,5 +7,5 @@ This repository contains applications developed as part of a practical work assi
 - **Application3_LogTempo**: Displays logs of specific events related to order editing.
 - **Application4_Log**: Shows the most recent log entries for specific events.
 
-Additionally, you will find the script `DoWorkSQL.sql` is used for testing concurrent transactions and the detailed report `Relatorio_SGBD_Transacoes.pdf` explaines the work done.
+Additionally, the script `DoWorkSQL.sql` is used for testing concurrent transactions and the detailed report `Relatorio_SGBD_Transacoes.pdf` explaines the work done.
 
